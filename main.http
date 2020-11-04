@@ -12,10 +12,17 @@
 #     "password": "password"
 # }
 
-POST http://localhost:8080/api/v1/sessions HTTP/1.1
+# POST http://localhost:8080/api/v1/sessions HTTP/1.1
+# content-type: application/json
+
+# {
+#     "email": "zaky@gmail.com",
+#     "password": "password"
+# }
+
+POST http://localhost:8080/api/v1/email_checkers HTTP/1.1
 content-type: application/json
 
 {
-    "email": "zaky@gmail.com",
-    "password": "password"
+    "email": "zaky@gmail.com"
 }
