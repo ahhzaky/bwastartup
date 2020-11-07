@@ -23,6 +23,8 @@ func main() {
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
+	// validate token in middaleware
+
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
