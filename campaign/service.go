@@ -1,1 +1,30 @@
 package campaign
+
+type Service interface {
+	FindCampaigns(userID int) ([]Campaign, error)
+}
+
+type service struct {
+	repository Repository
+}
+
+func NewService(repository Repository) *service {
+	return &service{repository}
+}
+
+func (s *service) FindCampaigns(userID int) ([]Campaign, error) {
+	// proses jika dia gak kosong user id
+	if userID != 0 {
+		campaign, err := s.repository.FindByUserID(userID)
+
+		if err != nil {
+			return campaign, err
+		}
+		return campaign, nil
+	}
+	campaign, err := s.repository.FindAll()
+	if err != nil {
+		return campaign, err
+	}
+	return campaign, nil
+}
