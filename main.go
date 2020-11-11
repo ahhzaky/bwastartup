@@ -35,6 +35,7 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
+	router.Static("/images", "./images")
 	api := router.Group("api/v1")
 
 	// process awalan user
@@ -42,6 +43,7 @@ func main() {
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
 	//// -----
 	// process campaign
 	api.GET("/campaigns", campaignHandler.GetCampaign)
