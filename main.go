@@ -46,7 +46,8 @@ func main() {
 
 	//// -----
 	// process campaign
-	api.GET("/campaigns", campaignHandler.GetCampaign)
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 
 	router.Run()
 
