@@ -1,0 +1,19 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=mysql://root:password@db:3306/bwastarup?charset=utf8&parseTime=True
+    depends_on:
+      - db
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=bwastarup
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database/bwastarup.sql:/docker-entrypoint-initdb.d
