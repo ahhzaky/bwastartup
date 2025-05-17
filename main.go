@@ -7,19 +7,40 @@ import (
 	"bwastartup/helper"
 	"bwastartup/transaction"
 	"bwastartup/user"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql"
+	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+var (
+	dbHost    = os.Getenv("DB_HOST")
+	dbUser    = os.Getenv("DB_USER")
+	dbPwd     = os.Getenv("DB_PASSWORD")
+	dbName    = os.Getenv("DB_NAME")
+	dbPort    = os.Getenv("DB_PORT")
+	dbSSLMode = os.Getenv("DB_SSLMODE")
+)
+
 func main() {
-	dsn := "root:@tcp(127.0.0.1:3306)/bwastartup?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
+		dbHost, dbUser, dbPwd, dbName, dbPort, dbSSLMode)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal(err.Error())
