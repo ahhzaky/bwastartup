@@ -21,24 +21,24 @@ import (
 )
 
 var (
-	dbHost    = os.Getenv("DB_HOST")
-	dbUser    = os.Getenv("DB_USER")
-	dbPwd     = os.Getenv("DB_PASSWORD")
-	dbName    = os.Getenv("DB_NAME")
-	dbPort    = os.Getenv("DB_PORT")
-	dbSSLMode = os.Getenv("DB_SSLMODE")
+	dbHost     = os.Getenv("DB_HOST")
+	dbUser     = os.Getenv("DB_USER")
+	dbPwd      = os.Getenv("DB_PASSWORD")
+	dbName     = os.Getenv("DB_NAME")
+	dbPort     = os.Getenv("DB_PORT")
+	dbSSLMode  = os.Getenv("DB_SSLMODE")
+	dbTimeZone = os.Getenv("DB_TIMEZONE")
 )
 
 func main() {
-	// godotenv.Load()
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Shanghai",
-		dbHost, dbUser, dbPwd, dbName, dbPort, dbSSLMode)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
+		dbHost, dbUser, dbPwd, dbName, dbPort, dbSSLMode, dbTimeZone)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
