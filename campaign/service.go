@@ -75,7 +75,7 @@ func (s *service) UpdateCampaign(inputID GetCampaignDetailInput, inputData Creat
 
 	// cek apakah ia adalah user pembuat campaign
 	if campaign.UserID != inputData.User.ID {
-		return campaign, errors.New("Not an owner of campaign")
+		return campaign, errors.New("not an owner of campaign")
 	}
 
 	// input data yang dikirim(ini nilai baru)
@@ -99,15 +99,14 @@ func (s *service) SaveCampaignImage(input CreateCampaignImageInput, fileLocation
 		return CampaignImage{}, err
 	}
 
-	// cek apakah ia adalah user pembuat campaign
 	if campaign.UserID != input.User.ID {
-		return CampaignImage{}, errors.New("Not an owner of campaign")
+		return CampaignImage{}, errors.New("not an owner of the campaign")
 	}
 
 	isPrimary := 0
-
 	if input.IsPrimary {
 		isPrimary = 1
+
 		_, err := s.repository.MarkAllImagesAsNonPrimary(input.CampaignID)
 		if err != nil {
 			return CampaignImage{}, err
@@ -123,5 +122,6 @@ func (s *service) SaveCampaignImage(input CreateCampaignImageInput, fileLocation
 	if err != nil {
 		return newCampaignImage, err
 	}
+
 	return newCampaignImage, nil
 }
