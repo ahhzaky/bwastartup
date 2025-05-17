@@ -9,6 +9,7 @@ require (
 	github.com/gosimple/slug v1.15.0
 	github.com/joho/godotenv v1.5.1
 	github.com/leekchan/accounting v1.0.0
+	github.com/veritrans/go-midtrans v0.0.0-20210616100512-16326c5eeb00
 	golang.org/x/crypto v0.38.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.26.1
@@ -17,6 +18,7 @@ require (
 require (
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
+	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
