@@ -54,6 +54,7 @@ CREATE TABLE transactions (
   amount INTEGER,
   status VARCHAR(255),
   code VARCHAR(255),
+  payment_url VARCHAR(255),
   created_at TIMESTAMP,
   updated_at TIMESTAMP
 );
