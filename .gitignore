@@ -30,3 +30,4 @@ go.work
 
 # Gin specific temporary files (if any)
 tmp/
+todo.md
