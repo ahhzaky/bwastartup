@@ -1,32 +1,114 @@
-# Midtrans Payment API Integration (Golang)
+# 🧰 Fullstack Monorepo: Golang (Gin) + Nuxt.js
 
-This project is a learning-based implementation of an API service focused on integrating with the **Midtrans payment gateway**. Initially started in **2020**, the purpose of this project is to gain deeper understanding of **third-party payment systems** and to improve practical experience in building **RESTful APIs using Go (Golang)**.
+This monorepo contains a fullstack web application built with:
 
-## 🧠 Purpose
+- **Backend:** Golang with Gin framework, GORM ORM, PostgreSQL, and integration with a third-party payment API (MODTRAN).
+- **Frontend:** Nuxt.js (Vue 3) with Tailwind CSS.
+- **Tooling:** Docker, GitHub Actions CI/CD, Dependabot, and `.env`-based configuration.
 
-- Learn and implement secure, real-world API integration with Midtrans.
-- Understand the workflow of online payments using third-party gateways.
-- Improve skills in Golang backend development, database management, and API design.
+---
 
-## 🚀 What's New
+## 📂 Project Structure
 
-This project has been upgraded and improved over time:
+```
 
-- ✅ **Golang upgrade**: Migrated from Go `v1.15` to **Go `v1.24`** for better performance and modern features.
-- ✅ **Database migration**: Switched from **MySQL** to **PostgreSQL** for more robust and scalable data handling.
-- ✅ **Midtrans Gateway Refresh**: Updated the Midtrans payment logic to align with the latest API specs and security best practices.
+my-monorepo/
+├── backend/ # Golang API using Gin, GORM, PostgreSQL
+├── frontend/ # Nuxt.js app with Tailwind CSS
+└── .github/ # Shared GitHub Actions workflows and Dependabot config
 
-## 🔧 Features
+```
 
-- Midtrans Snap API integration
-- Secure transaction handling
-- Modular service structure
-- Configurable environment settings
-- File `.env.example` for konfiguration
+---
 
-> ℹ️ While the core functionality is stable, **further features and improvements are planned**.
+## ⚙️ Backend: Golang API
 
-## 📚 Reference
+- Built using [Gin](https://github.com/gin-gonic/gin) — fast HTTP web framework
+- ORM powered by [GORM](https://gorm.io/)
+- Database: PostgreSQL
+- Payment Integration: [MODTRAN third-party API]
+- Configurable via `.env` file
+- Containerized with Docker
 
-- Project base: [BWA Startup](https://buildwithangga.com/kelas/full-stack-golang-vue-nuxtjs-website-crowdfunding)
-- Code: [Github](https://github.com/ahhzaky/bwastartup)
+### ➤ Run Backend Locally
+
+```bash
+cd backend
+cp .env.example .env
+go run main.go
+```
+
+### ➤ Run Backend with Docker
+
+```bash
+docker compose up --build
+```
+
+---
+
+## 🖼️ Frontend: Nuxt.js
+
+- Framework: [Nuxt 3](https://nuxt.com/)
+- UI: [Tailwind CSS](https://tailwindcss.com/)
+- SSR-ready, optimized for performance
+
+### ➤ Run Frontend Locally
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+---
+
+## 🐳 Docker Support
+
+Both backend and frontend are dockerized. You can run the entire stack using:
+
+```bash
+docker-compose up --build
+```
+
+(Separate `docker-compose.yml` files may exist in `backend/` and `frontend/` as needed.)
+
+---
+
+## 🔐 Environment Variables
+
+Each service has its own `.env` file. Examples provided:
+
+- `backend/.env.example`
+- `frontend/.env.example`
+
+Make sure to set required keys for database, API credentials, etc.
+
+---
+
+## 🔄 CI/CD & Dependabot
+
+- GitHub Actions configured for both backend and frontend (`.github/workflows`)
+- Dependabot configured to keep dependencies up-to-date:
+
+  - Go modules (`/backend`)
+  - NPM packages (`/frontend`)
+
+---
+
+## 📦 Tech Stack Summary
+
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
+| Backend  | Go, Gin, GORM, PostgreSQL          |
+| API      | MODTRAN third-party payment API    |
+| Frontend | Nuxt.js, Tailwind CSS, Node.js     |
+| DevOps   | Docker, GitHub Actions, Dependabot |
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License. See `LICENSE` for details.
+
+---
