@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   web:
     build: .
@@ -9,11 +9,18 @@ services:
     depends_on:
       - db
   db:
-    image: mysql:latest
+    image: postgres:latest
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=bwastarup
+      - DB_HOST=localhost
+      - DB_USER=postgres
+      - DB_PASSWORD=
+      - DB_NAME=
+      - DB_PORT=
+      - DB_SSLMODE=disable
+      - DB_TIMEZONE=
+      - MIDTRANS_SERVER_KEY=
+      - MIDTRANS_CLIENT_KEY=
     ports:
       - "3306:3306"
     volumes:
-      - ./database/bwastarup.sql:/docker-entrypoint-initdb.d
+      - ./database/postgress.sql:/docker-entrypoint-initdb.d
