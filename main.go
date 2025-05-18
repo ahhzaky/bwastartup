@@ -116,6 +116,9 @@ func main() {
 	router.GET("/users/new", userWebHandler.New)
 	router.POST("/users", userWebHandler.Create)
 	router.GET("/users/edit/:id", userWebHandler.Edit)
+	router.POST("/users/update/:id", authAdminMiddleware(), userWebHandler.Update)
+	router.GET("/users/avatar/:id", authAdminMiddleware(), userWebHandler.NewAvatar)
+	router.POST("/users/avatar/:id", authAdminMiddleware(), userWebHandler.CreateAvatar)
 
 	router.GET("/login", sessionWebHandler.New)
 	router.POST("/session", sessionWebHandler.Create)
