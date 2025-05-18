@@ -22,6 +22,7 @@ This project has been upgraded and improved over time:
 - Secure transaction handling
 - Modular service structure
 - Configurable environment settings
+- File `.env.example` for konfiguration
 
 > ℹ️ While the core functionality is stable, **further features and improvements are planned**.
 
@@ -29,14 +30,3 @@ This project has been upgraded and improved over time:
 
 - Project base: [BWA Startup](https://buildwithangga.com/kelas/full-stack-golang-vue-nuxtjs-website-crowdfunding)
 - Code: [Github](https://github.com/ahhzaky/bwastartup)
-
----
-
-Jika Anda ingin, saya bisa bantu tambahkan:
-
-- Diagram arsitektur
-- Contoh request/response Midtrans
-- Cara menjalankan di lokal (Go + PostgreSQL)
-- File `.env.example` untuk konfigurasi
-
-Cukup beri tahu, dan saya bantu lanjutkan.
