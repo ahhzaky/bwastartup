@@ -12,6 +12,7 @@ type Repository interface {
 	GetByID(ID int) (Transaction, error)
 	Save(transaction Transaction) (Transaction, error)
 	Update(transaction Transaction) (Transaction, error)
+	FindAll() ([]Transaction, error)
 }
 
 func NewRepository(db *gorm.DB) *repository {

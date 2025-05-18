@@ -30,23 +30,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// var (
-// 	dbHost     = os.Getenv("DB_HOST")
-// 	dbUser     = os.Getenv("DB_USER")
-// 	dbPwd      = os.Getenv("DB_PASSWORD")
-// 	dbName     = os.Getenv("DB_NAME")
-// 	dbPort     = os.Getenv("DB_PORT")
-// 	dbSSLMode  = os.Getenv("DB_SSLMODE")
-// 	dbTimeZone = os.Getenv("DB_TIMEZONE")
-// )
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=%s",
 		os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"), os.Getenv("DB_SSLMODE"), os.Getenv("DB_TIMEZONE"))
 
@@ -72,6 +61,8 @@ func main() {
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	userWebHandler := webHandler.NewUserHandler(userService)
+	campaignWebHanlder := webHandler.NewCampaignHandler(campaignService, userService)
+	transactionWebHandler := webHandler.NewTransactionHandler(transactionService)
 
 	sessionWebHandler := webHandler.NewSessionHandler(userService)
 
@@ -119,6 +110,17 @@ func main() {
 	router.POST("/users/update/:id", authAdminMiddleware(), userWebHandler.Update)
 	router.GET("/users/avatar/:id", authAdminMiddleware(), userWebHandler.NewAvatar)
 	router.POST("/users/avatar/:id", authAdminMiddleware(), userWebHandler.CreateAvatar)
+
+	// admin campaign
+	router.GET("/campaigns", authAdminMiddleware(), campaignWebHanlder.Index)
+	router.GET("/campaigns/new", authAdminMiddleware(), campaignWebHanlder.New)
+	router.POST("/campaigns", authAdminMiddleware(), campaignWebHanlder.Create)
+	router.GET("/campaigns/image/:id", authAdminMiddleware(), campaignWebHanlder.NewImage)
+	router.POST("/campaigns/image/:id", authAdminMiddleware(), campaignWebHanlder.CreateImage)
+	router.GET("/campaigns/edit/:id", authAdminMiddleware(), campaignWebHanlder.Edit)
+	router.POST("/campaigns/update/:id", authAdminMiddleware(), campaignWebHanlder.Update)
+	router.GET("/campaigns/show/:id", authAdminMiddleware(), campaignWebHanlder.Show)
+	router.GET("/transactions", authAdminMiddleware(), transactionWebHandler.Index)
 
 	router.GET("/login", sessionWebHandler.New)
 	router.POST("/session", sessionWebHandler.Create)
