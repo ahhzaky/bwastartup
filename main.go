@@ -115,6 +115,7 @@ func main() {
 	router.GET("/users", authAdminMiddleware(), userWebHandler.Index)
 	router.GET("/users/new", userWebHandler.New)
 	router.POST("/users", userWebHandler.Create)
+	router.GET("/users/edit/:id", userWebHandler.Edit)
 
 	router.GET("/login", sessionWebHandler.New)
 	router.POST("/session", sessionWebHandler.Create)
