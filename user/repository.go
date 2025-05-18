@@ -4,12 +4,13 @@ import (
 	"gorm.io/gorm"
 )
 
-//KONTRAK
+// KONTRAK
 type Repository interface {
 	Save(user User) (User, error)
 	FindByEmail(email string) (User, error)
 	FindByID(ID int) (User, error)
 	Update(user User) (User, error)
+	FindAll() ([]User, error)
 }
 
 type repository struct {
@@ -59,4 +60,16 @@ func (r *repository) Update(user User) (User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+// show all user
+func (r *repository) FindAll() ([]User, error) {
+	var users []User
+
+	err := r.db.Find(&users).Error
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
 }
