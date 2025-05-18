@@ -1,6 +1,7 @@
 # Go parameters
 GOCMD=go
 GORUN=$(GOCMD) run
+GOMOD=$(GOCMD) mod tidy
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
@@ -28,6 +29,9 @@ all: run
 run:
 	@echo "Running the application Http..."
 	@$(GORUN) main.go
-	
 
-.PHONY: run
+mod:
+	@echo "Updating go modules..."
+	@$(GOMOD)
+
+.PHONY: run mod
