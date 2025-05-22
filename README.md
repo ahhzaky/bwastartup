@@ -98,12 +98,12 @@ Make sure to set required keys for database, API credentials, etc.
 
 ## 📦 Tech Stack Summary
 
-| Layer    | Technology                         |
-| -------- | ---------------------------------- |
-| Backend  | Go, Gin, GORM, PostgreSQL          |
-| API      | MODTRAN third-party payment API    |
-| Frontend | Nuxt.js, Tailwind CSS, Node.js     |
-| DevOps   | Docker, GitHub Actions, Dependabot |
+| Layer    | Technology                                                     |
+| -------- | -------------------------------------------------------------- |
+| Backend  | Go, Gin, GORM, PostgreSQL                                      |
+| API      | [Midtrans](https://docs.midtrans.com/) third-party payment API |
+| Frontend | Nuxt.js, Tailwind CSS, Node.js                                 |
+| DevOps   | Docker, GitHub Actions, Dependabot                             |
 
 ---
 
