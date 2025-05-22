@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   // Kompatibilitas dan devtools
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+  css: ['@/assets/css/tailwind.css'],
+  tailwindcss: {
+    exposeConfig: true,
+    configPath: 'tailwind.config.js',
+    viewer: false
+  },
 
   // SPA-like behavior (disable SSR)
   ssr: false,
@@ -10,37 +16,13 @@ export default defineNuxtConfig({
   // Modules
   modules: [
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/axios',
-    [
-      '@nuxtjs/auth-next',
-      {
-        strategies: {
-          local: {
-            token: {
-              property: 'data.token',
-              type: 'Bearer'
-            },
-            user: {
-              property: 'data',
-              autoFetch: true
-            },
-            endpoints: {
-              login: { url: '/api/v1/sessions', method: 'post' },
-              logout: false,
-              user: { url: '/api/v1/users/fetch', method: 'get' }
-            }
-          }
-        }
-      }
-    ]
+    '@pinia/nuxt',
   ],
 
   // Runtime environment (env var)
   runtimeConfig: {
     public: {
-      axios: {
-        baseURL: process.env.BASEURL  // untuk axios module 
-      }
+        BASE_URL_API: process.env.BASE_URL_API || 'https://localhost:8080'  // untuk axios module 
     }
   },
 
@@ -82,5 +64,6 @@ export default defineNuxtConfig({
     }
   },
   // Build config
-  build: {}
+  build: {
+  }
 })
