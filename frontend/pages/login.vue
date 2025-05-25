@@ -15,10 +15,9 @@
             >
             <input
               type="email"
-              v-model="login.email"
+              v-model="loginData.email"
               class="auth-form focus:outline-none focus:bg-purple-hover focus:shadow-outline focus:border-purple-hover-stroke focus:text-gray-100"
               placeholder="Write your email address here"
-              value="julia.keeva@gmail.com"
             />
           </div>
         </div>
@@ -30,10 +29,9 @@
             <input
               @keyup.enter="userLogin"
               type="password"
-              v-model="login.password"
+              v-model="loginData.password"
               class="auth-form focus:outline-none focus:bg-purple-hover focus:shadow-outline focus:border-purple-hover-stroke focus:text-gray-100"
               placeholder="Write your password here"
-              value="nasigorenglimaribbu"
             />
           </div>
         </div>
@@ -50,8 +48,8 @@
         <div class="text-center">
           <p class="text-white text-md">
             Don't have account?
-            <nuxt-link to="/register" class="no-underline text-orange-button"
-              >Sign Up</nuxt-link
+            <NuxtLink to="/register" class="no-underline text-orange-button"
+              >Sign Up</NuxtLink
             >.
           </p>
         </div>
@@ -60,29 +58,63 @@
   </div>
 </template>
 
-<script>
-export default {
+<script setup>
+import { ref } from 'vue';
+import { useAuthStore } from '~/stores/auth'; // Sesuaikan path jika berbeda
+import { useRouter } from 'vue-router';
+
+// Mendefinisikan layout
+definePageMeta({
   layout: 'auth',
-  data() {
-    return {
-      login: {
-        email: 'julia@bwa.com',
-        password: 'password',
+});
+
+const authStore = useAuthStore();
+const router = useRouter();
+const config = useRuntimeConfig(); // Ini sekarang akan menggunakan fungsi bawaan Nuxt
+
+const loginData = ref({
+  email: 'moder-test@jck.com',
+  password: 'password',
+});
+
+async function userLogin() {
+  try {
+    const response = await fetch(`${config.public.BASE_URL_API}/api/v1/sessions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify(loginData.value),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.meta?.message || 'Login failed');
     }
-  },
-  methods: {
-    async userLogin() {
-      try {
-        let response = await this.$auth.loginWith('local', { data: this.login })
-        this.$auth.setUser(response.data.data)
-        console.log(response)
-      } catch (err) {
-        console.log(err)
-      }
-    },
-  },
+
+    const responseData = await response.json();
+    
+    authStore.login({ 
+        name: responseData.data.name, 
+        // image_url: responseData.data.image_url 
+    }); 
+    
+    if (responseData.data.token) {
+        localStorage.setItem('authToken', responseData.data.token);
+    }
+
+    router.push('/'); 
+
+    console.log(responseData);
+  } catch (err) {
+    console.error(err.message || err);
+  }
 }
+
+// HAPUS BAGIAN INI:
+// function useRuntimeConfig() {
+//  throw new Error('Function not implemented.');
+// }
 </script>
 
 <style lang="scss" scoped>

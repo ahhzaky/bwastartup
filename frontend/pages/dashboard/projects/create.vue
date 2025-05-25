@@ -6,21 +6,26 @@
       </div>
     </section>
     <section class="container mx-auto pt-8">
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mb-6">
         <div class="w-full mr-6">
           <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
         </div>
       </div>
       <div class="flex justify-between items-center">
         <div class="w-3/4 mr-6">
-          <h3 class="text-2xl text-gray-900 mb-4">Create New Projects</h3>
+          <h3 class="text-2xl text-gray-900 mb-4">Create New Project</h3>
         </div>
         <div class="w-1/4 text-right">
           <button
-            @click="save"
-            class="bg-green-button hover:bg-green-button text-white font-bold px-4 py-1 rounded inline-flex items-center"
+            @click="saveCampaign"
+            class="bg-green-button hover:bg-green-darker text-white font-bold px-4 py-2 rounded inline-flex items-center"
+            :disabled="isSaving"
           >
-            Save
+             <svg v-if="isSaving" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            {{ isSaving ? 'Saving...' : 'Save Project' }}
           </button>
         </div>
       </div>
@@ -29,7 +34,7 @@
           <div
             class="w-full border border-gray-400 bg-white rounded p-8 flex flex-col justify-between leading-normal"
           >
-            <form class="w-full">
+            <form class="w-full" @submit.prevent="saveCampaign">
               <div class="flex flex-wrap -mx-3 mb-6">
                 <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                   <label
@@ -48,7 +53,7 @@
                   <label
                     class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                   >
-                    Price
+                    Goal Amount (Rp)
                   </label>
                   <input
                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -74,7 +79,7 @@
                   <label
                     class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                   >
-                    What will backers get
+                    What will backers get (comma separated)
                   </label>
                   <input
                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -92,10 +97,24 @@
                   <textarea
                     class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     type="text"
+                    rows="5"
                     placeholder="Isi deskripsi panjang untuk projectmu"
                     v-model="campaign.description"
                   ></textarea>
                 </div>
+                 <div class="w-full px-3 mt-4">
+                    <button
+                      type="submit"
+                      class="bg-green-button hover:bg-green-darker text-white font-bold py-3 px-6 rounded"
+                      :disabled="isSaving"
+                    >
+                       <svg v-if="isSaving" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {{ isSaving ? 'Saving...' : 'Save Campaign' }}
+                    </button>
+                  </div>
               </div>
             </form>
           </div>
@@ -108,41 +127,90 @@
   </div>
 </template>
 
-<script>
-export default {
-  middleware: 'auth',
-  data() {
-    return {
-      campaign: {
-        name: '',
-        short_description: '',
-        description: '',
-        goal_amount: 0,
-        perks: '',
+<script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '~/stores/auth'; // Pastikan path ini benar
+
+// Komponen Navbar dan Footer akan di-auto-import
+// import Navbar from '~/components/Navbar.vue';
+// import Footer from '~/components/Footer.vue';
+
+definePageMeta({
+  middleware: 'auth', // Pastikan middleware auth sudah ada dan berfungsi
+});
+
+const router = useRouter();
+const authStore = useAuthStore();
+const config = useRuntimeConfig();
+
+const campaign = ref({
+  name: '',
+  short_description: '',
+  description: '',
+  goal_amount: 0,
+  perks: '', // Perks diharapkan sebagai string tunggal dipisahkan koma oleh backend
+});
+
+const isSaving = ref(false);
+const errorLog = ref(null);
+
+
+async function saveCampaign() {
+  if (!authStore.loggedIn) {
+    alert('Please login to create a campaign.');
+    return router.push('/login');
+  }
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('Authentication token not found.');
+    return router.push('/login');
+  }
+
+  isSaving.value = true;
+  errorLog.value = null;
+
+  // Pastikan goal_amount adalah angka
+  const payload = {
+    ...campaign.value,
+    goal_amount: Number(campaign.value.goal_amount) || 0,
+  };
+
+  try {
+    const response = await $fetch('/api/v1/campaigns', {
+      baseURL: config.public.BASE_URL_API,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
+      body: payload,
+    });
+
+    // response.data.id berdasarkan struktur yang diharapkan dari CreateCampaign handler
+    if (response.data && response.data.id) {
+        alert('Campaign created successfully!');
+        router.push({
+            name: 'dashboard-projects-id', // Rute ke detail campaign yang baru dibuat
+            params: { id: response.data.id },
+        });
+    } else {
+        console.error('Campaign ID not found in response:', response);
+        alert('Campaign created, but could not retrieve ID. Please check your dashboard.');
+        router.push('/dashboard');
     }
-  },
-  methods: {
-    async save() {
-      try {
-        let response = await this.$axios.$post(
-          '/api/v1/campaigns',
-          this.campaign
-        )
-        this.$router.push({
-          name: 'dashboard-projects-id',
-          params: { id: response.data.id },
-        })
-        console.log(response)
-      } catch (err) {
-        console.log(err)
-      }
-    },
-  },
+  } catch (err) {
+    console.error('Error creating campaign:', err);
+    errorLog.value = err.data?.meta?.message || err.message || 'Failed to create campaign.';
+    alert(`Error: ${errorLog.value}`);
+  } finally {
+    isSaving.value = false;
+  }
 }
 </script>
 
 <style lang="scss">
+/* Style dari halaman dashboard/index.vue atau halaman lain yang relevan dapat dimasukkan di sini */
 .dashboard-header {
   background-image: url('/auth-background.svg');
   background-position: top right;
@@ -175,70 +243,7 @@ export default {
   background-size: 450px;
 }
 
-.card-project {
-  transition: all 0.3s ease 0s, opacity 0.5s cubic-bezier(0.5, 0, 0, 1) 1ms;
-  max-height: 445px;
-  overflow: hidden;
-
-  .button-cta {
-    opacity: 0;
-    transition: all 300ms ease;
-  }
-
-  &:hover {
-    box-shadow: 0 4px 25px 0 rgba(0, 0, 0, 0.15);
-
-    .button-cta {
-      opacity: 1;
-      transition: all 300ms ease;
-    }
-
-    .progress-bar,
-    .progress-info {
-      opacity: 0;
-      height: 0px;
-      margin: 0px;
-      padding: 0px;
-      transition: all 300ms ease;
-    }
-  }
-}
-
 footer {
   z-index: inherit;
-}
-
-.hero-underline {
-  text-decoration-color: #1abc9c;
-}
-
-.testimonial-user {
-  opacity: 0.4;
-  &.active {
-    opacity: 1;
-    border: 5px solid #fff;
-    box-shadow: 0 0 0 1px #3b41e3;
-  }
-}
-
-.list-check {
-  li {
-    background: url('/icon-checklist.svg') no-repeat left 8px;
-    padding: 6px 0px 3px 28px;
-  }
-}
-
-.item-thumbnail:hover {
-  background-color: #ff872e;
-  border-radius: 20px;
-  &:after {
-    position: absolute;
-    top: 38%;
-    left: 41%;
-    content: url('/icon-thumbnail-hover.svg');
-  }
-  img {
-    opacity: 0.3;
-  }
 }
 </style>

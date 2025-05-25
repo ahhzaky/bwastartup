@@ -1,16 +1,16 @@
 <template>
   <header class="flex items-center">
-    <div style="height: 54px;" class="pr-5">
+    <div style="height: 54px" class="pr-5">
       <img src="/logo.svg" alt="logo" class="h-full" />
     </div>
     <ul class="flex items-center">
       <li>
-        <nuxt-link
+        <NuxtLink
           class="text-white hover:text-teal-500 text-lg px-4 py-3"
           to="/"
         >
           Home
-        </nuxt-link>
+        </NuxtLink>
       </li>
       <li>
         <a
@@ -36,23 +36,23 @@
     </ul>
     <ul
       class="flex ml-auto items-center mt-2"
-      v-if="!auth.loggedIn"
+      v-if="!authStore.loggedIn"
     >
       <li>
-        <nuxt-link
+        <NuxtLink
           to="/register"
           class="inline-block bg-transparent border-white border hover:bg-white hover:bg-opacity-25 text-white font-light w-40 text-center px-6 py-1 text-lg rounded-full mr-4"
         >
           Sign Up
-        </nuxt-link>
+        </NuxtLink>
       </li>
       <li>
-        <nuxt-link
+        <NuxtLink
           to="/login"
           class="inline-block bg-transparent border-white border hover:bg-white hover:bg-opacity-25 text-white font-light w-40 text-center px-6 py-1 text-lg rounded-full"
         >
           My Account
-        </nuxt-link>
+        </NuxtLink>
       </li>
     </ul>
     <div class="flex ml-auto" v-else>
@@ -61,15 +61,19 @@
           class="bg-white text-gray-700 font-semibold py-4 px-6 rounded inline-flex items-center"
         >
           <img
-            v-if="$store.state.auth.user.image_url"
-            :src="
-              $axios.defaults.baseURL + '/' + $store.state.auth.user.image_url
-            "
-            alt=""
-            class="h-8 rounded-full mr-2"
+            v-if="authStore.user?.image_url"
+            :src="`${config.public.BASE_URL_API}/${authStore.user.image_url}`"
+            alt="User Avatar"
+            class="h-8 w-8 object-cover rounded-full mr-2"
+          />
+          <img
+            v-else
+            src="/avatar.jpg"
+            alt="Default Avatar"
+            class="h-8 w-8 object-cover rounded-full mr-2"
           />
           <span class="mr-1">
-            {{ auth.user?.name }}
+            {{ authStore.user?.name || 'User' }}
           </span>
           <svg
             class="fill-current h-4 w-4"
@@ -85,23 +89,23 @@
           class="dropdown-menu absolute hidden text-gray-700 pt-1 shadow w-full -mt-2"
         >
           <li class="">
-            <nuxt-link
+            <NuxtLink
               class="bg-white hover:bg-gray-100 hover:text-orange-500 py-2 px-4 block whitespace-no-wrap"
               to="/dashboard"
-              >My Dashboard</nuxt-link
+              >My Dashboard</NuxtLink
             >
           </li>
           <li class="">
-            <nuxt-link
+            <NuxtLink
               class="bg-white hover:bg-gray-100 border-t hover:text-orange-500 py-2 px-4 block whitespace-no-wrap"
-              to="/dashboard"
-              >Account Settings</nuxt-link
+              to="/dashboard/settings" 
+            >Account Settings</NuxtLink 
             >
           </li>
           <li class="">
             <a
               class="cursor-pointer rounded-b bg-white hover:bg-gray-100 border-t hover:text-orange-500 py-2 px-4 block whitespace-no-wrap"
-              @click="logout()"
+              @click="performLogout"
               >Logout</a
             >
           </li>
@@ -118,24 +122,36 @@
 </style>
 
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-const config = useRuntimeConfig()
-const baseURL = config.public.baseURL
+import { useAuthStore } from '~/stores/auth'; // Pastikan path ini benar
+import { useRouter } from 'vue-router';
 
-const auth = useAuthStore()
+const authStore = useAuthStore();
+const router = useRouter();
+const config = useRuntimeConfig();
+// const baseURL = config.public.BASE_URL_API; // Sudah ada di config
 
-const logout = async () => {
-  auth.logout()
+async function performLogout() {
+  // Panggil action logout di store, yang seharusnya menghapus data user dan token
+  authStore.logout();
+
+  // Hapus token dari localStorage (atau di mana pun menyimpannya)
+  localStorage.removeItem('authToken');
+
+  // (Opsional) Panggil endpoint logout di backend jika ada
+  // try {
+  //   await $fetch('/api/v1/logout', { // Ganti dengan endpoint logout yang sebenarnya
+  //     method: 'POST', // atau GET, sesuai implementasi backend
+  //     baseURL: config.public.BASE_URL_API,
+  //     headers: {
+  //       // 'Authorization': `Bearer ${token_yang_mungkin_masih_ada}`, // Jika backend memerlukan token untuk logout
+  //     },
+  //   });
+  //   console.log('Successfully logged out from backend');
+  // } catch (error) {
+  //   console.error('Error logging out from backend:', error);
+  // }
+
+  // Redirect ke halaman login
+  router.push({ path: '/login' });
 }
-  // await $fetch('/logout', {
-  //   method: 'GET',
-  //   baseURL: baseURL,
-  //   headers: {
-  //     Authorization: `Bearer ${auth.token}`,
-  //   },
-  // })
-  // .then((response) => {
-  //   auth.logout()
-  //   this.$router.push({ path: '/login' })
-  // })
 </script>

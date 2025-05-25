@@ -11,46 +11,54 @@
           <h2 class="text-4xl text-gray-900 mb-2 font-medium">Dashboard</h2>
           <ul class="flex mt-2">
             <li class="mr-6">
-              <a class="text-gray-800 font-bold" href="#"> Your Projects </a>
+              <NuxtLink class="text-gray-800 font-bold" to="/dashboard"> Your Projects </NuxtLink>
             </li>
             <li class="mr-6">
-              <nuxt-link
+              <NuxtLink
                 class="text-gray-500 hover:text-gray-800"
                 to="/dashboard/transactions"
               >
                 Your Transactions
-              </nuxt-link>
+              </NuxtLink>
             </li>
           </ul>
         </div>
         <div class="w-1/4 text-right">
-          <nuxt-link
+          <NuxtLink
             to="/dashboard/projects/create"
             class="bg-orange-button hover:bg-green-button text-white font-bold py-4 px-4 rounded inline-flex items-center"
           >
             + Create Campaign
-          </nuxt-link>
+          </NuxtLink>
         </div>
       </div>
       <hr />
       <div class="block mb-2">
+        <div v-if="pending" class="text-center py-10">
+          <p>Loading your projects...</p>
+          </div>
+        <div v-else-if="fetchError" class="text-center py-10 text-red-500">
+          <p>Failed to load your projects: {{ fetchError.message || fetchError }}</p>
+        </div>
+        <div v-else-if="campaigns && campaigns.length === 0" class="text-center py-10 text-gray-500">
+          <p>You haven't created any projects yet. <NuxtLink to="/dashboard/projects/create" class="text-orange-button hover:underline">Create one now!</NuxtLink></p>
+        </div>
         <div
+          v-else
           class="w-full lg:max-w-full lg:flex mb-4"
-          v-for="campaign in campaigns.data"
+          v-for="campaign in campaigns"
           :key="campaign.id"
         >
           <div
             class="border h-48 lg:h-auto lg:w-64 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
-            :style="
-              'background-color: #bbb; background-position: center; background-image: url(\'' +
-              $axios.defaults.baseURL +
-              '/' +
-              campaign.image_url +
-              '\')'
-            "
+            :style="{
+              backgroundColor: '#bbb',
+              backgroundPosition: 'center',
+              backgroundImage: `url('${config.public.BASE_URL_API}/${campaign.image_url}')`
+            }"
           ></div>
-          <nuxt-link
-            :to="'/dashboard/projects/' + campaign.id"
+          <NuxtLink
+            :to="`/dashboard/projects/${campaign.id}`" 
             class="w-full border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-8 flex flex-col justify-between leading-normal"
           >
             <div class="mb-8">
@@ -61,18 +69,18 @@
                 Rp.
                 {{ new Intl.NumberFormat().format(campaign.goal_amount) }}
                 &middot;
-                {{ (campaign.current_amount / campaign.goal_amount) * 100 }}%
+                {{ progressBarWidth(campaign).toFixed(0) }}%
               </p>
               <p class="text-gray-700 text-base">
                 {{ campaign.short_description }}
               </p>
             </div>
             <div class="flex items-center">
-              <button class="bg-green-button text-white py-2 px-4 rounded">
+              <NuxtLink :to="`/dashboard/projects/${campaign.id}`" class="bg-green-button text-white py-2 px-4 rounded">
                 Detail
-              </button>
+              </NuxtLink>
             </div>
-          </nuxt-link>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -82,21 +90,104 @@
   </div>
 </template>
 
-<script>
-export default {
-  middleware: 'auth',
-  async asyncData({ $axios, app }) {
-    const campaigns = await $axios.$get(
-      '/api/v1/campaigns?user_id=' + app.$auth.user.id
-    )
-    return { campaigns }
-  },
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useAuthStore } from '~/stores/auth'; // Pastikan path ini benar
+import { useRouter } from 'vue-router';
+
+// Komponen Navbar dan Footer akan di-auto-import jika ada di ~/components
+// import Navbar from '~/components/Navbar.vue';
+// import Footer from '~/components/Footer.vue';
+
+// Mendefinisikan middleware dan layout untuk halaman ini
+definePageMeta({
+  middleware: 'auth', // Pastikan  memiliki middleware/auth.js (atau .ts)
+  // Jika  memiliki layout khusus untuk dashboard,  bisa menambahkannya di sini
+  // layout: 'dashboard', 
+});
+
+const authStore = useAuthStore();
+const router = useRouter();
+const config = useRuntimeConfig();
+
+const campaigns = ref([]);
+const fetchError = ref(null);
+const pending = ref(true); // Untuk status loading
+
+async function fetchUserCampaigns() {
+  if (!authStore.user || !authStore.user.id) {
+    console.error('User not logged in or user ID not available');
+    // Mungkin redirect ke login jika user ID tidak ada, tergantung logika auth middleware 
+    // router.push('/login'); 
+    pending.value = false;
+    return;
+  }
+
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    console.error('Auth token not found');
+    // Mungkin redirect ke login
+    // router.push('/login');
+    pending.value = false;
+    return;
+  }
+  
+  pending.value = true;
+  fetchError.value = null;
+
+  try {
+    const response = await $fetch(`/api/v1/campaigns?user_id=${authStore.user.id}`, {
+      baseURL: config.public.BASE_URL_API,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      // Opsi transform untuk langsung mendapatkan array dari response.data
+      transform: (res) => res.data || []
+    });
+    campaigns.value = response;
+  } catch (e) {
+    console.error('Error fetching user campaigns:', e);
+    fetchError.value = e.data?.meta?.message || e.message || 'Failed to load projects.';
+    campaigns.value = [];
+  } finally {
+    pending.value = false;
+  }
 }
+
+// Panggil fetchUserCampaigns saat komponen dimuat jika pengguna sudah login
+// Atau, middleware 'auth'  seharusnya sudah memastikan pengguna login
+onMounted(() => {
+  if (authStore.loggedIn) {
+    fetchUserCampaigns();
+  } else {
+    // Jika authStore.loggedIn false, middleware auth seharusnya sudah redirect.
+    // Namun, sebagai fallback,  bisa tambahkan logika di sini.
+    console.log('User not logged in, redirecting from dashboard index.');
+    // router.push('/login'); // Tergantung bagaimana middleware  bekerja
+    pending.value = false;
+  }
+});
+
+const progressBarWidth = (campaign) => {
+  if (campaign && campaign.goal_amount > 0) {
+    const percentage = (campaign.current_amount / campaign.goal_amount) * 100;
+    return Math.min(percentage, 100);
+  }
+  return 0;
+};
+
+// Fungsi goToProject tidak lagi diperlukan di sini karena <NuxtLink> sudah menangani navigasi
+// function goToProject(id) {
+//   router.push({
+//     name: 'dashboard-projects-id', // Ini harusnya sesuai dengan struktur file, misal pages/dashboard/projects/[id].vue
+//     params: { id },
+//   });
+// }
 </script>
 
 <style lang="scss">
 .dashboard-header {
-  background-image: url('/auth-background.svg');
+  background-image: url('/auth-background.svg'); /* Pastikan path ini benar dan file ada di direktori public */
   background-position: top right;
   background-repeat: no-repeat;
   background-color: #3b41e3;
@@ -121,15 +212,16 @@ export default {
 }
 
 .call-to-action {
-  background-image: url('/auth-background.svg');
+  background-image: url('/auth-background.svg'); /* Pastikan path ini benar */
   background-position: top right;
   background-repeat: no-repeat;
   background-size: 450px;
 }
 
+/* Style lain yang sudah ada sebelumnya */
 .card-project {
   transition: all 0.3s ease 0s, opacity 0.5s cubic-bezier(0.5, 0, 0, 1) 1ms;
-  max-height: 485px;
+  /* max-height: 485px; */ /* Mungkin perlu disesuaikan atau dihapus jika memotong konten */
   overflow: hidden;
 
   .button-cta {
@@ -175,7 +267,7 @@ footer {
 
 .list-check {
   li {
-    background: url('/icon-checklist.svg') no-repeat left 8px;
+    background: url('/icon-checklist.svg') no-repeat left 8px; /* Pastikan path ini benar */
     padding: 6px 0px 3px 28px;
   }
 }
@@ -187,7 +279,7 @@ footer {
     position: absolute;
     top: 38%;
     left: 41%;
-    content: url('/icon-thumbnail-hover.svg');
+    content: url('/icon-thumbnail-hover.svg'); /* Pastikan path ini benar */
   }
   img {
     opacity: 0.3;

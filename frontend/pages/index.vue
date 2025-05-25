@@ -89,29 +89,30 @@
           </h2>
         </div>
         <div class="w-auto mt-5">
-          <a class="text-gray-900 hover:underline text-md font-medium" href=""
-            >View All</a
+          <NuxtLink to="/projects" class="text-gray-900 hover:underline text-md font-medium"
+            >View All</NuxtLink
           >
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-4 mt-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-3">
         <div
-          v-for="(campaign, index) in campaigns" :key="index"
+          v-for="campaign in campaigns"
+          :key="campaign.id"
           class="card-project w-full p-5 border border-gray-500 rounded-20"
         >
           <div class="item">
             <figure class="item-image">
               <img
-                :src="baseURL+ '/' + campaign.image_url"
-                alt=""
-                class="rounded-20 w-full"
+                :src="`${config.public.BASE_URL_API}/${campaign.image_url}`"
+                alt="Project image"
+                class="rounded-20 w-full h-48 object-cover"
               />
             </figure>
             <div class="item-meta">
-              <h4 class="text-3xl font-medium text-gray-900 mt-5">
+              <h4 class="text-2xl font-medium text-gray-900 mt-5 truncate">
                 {{ campaign.name }}
               </h4>
-              <p class="text-md font-light text-gray-900 h-12">
+              <p class="text-md font-light text-gray-900 h-12 overflow-hidden">
                 {{ campaign.short_description }}
               </p>
               <div class="relative pt-4 progress-bar">
@@ -119,18 +120,14 @@
                   class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-gray-200 h-3 rounded-lg"
                 >
                   <div
-                    :style="
-                      'width: ' +
-                      (campaign.current_amount / campaign.goal_amount) * 100 +
-                      '%'
-                    "
+                    :style="{ width: (campaign.current_amount / campaign.goal_amount) * 100 + '%' }"
                     class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-purple-progress progress-striped"
                   ></div>
                 </div>
               </div>
               <div class="flex progress-info">
                 <div>
-                  {{ (campaign.current_amount / campaign.goal_amount) * 100 }}%
+                  {{ ((campaign.current_amount / campaign.goal_amount) * 100).toFixed(0) }}%
                 </div>
                 <div class="ml-auto font-semibold">
                   Rp {{ new Intl.NumberFormat().format(campaign.goal_amount) }}
@@ -144,6 +141,12 @@
               Fund Now
             </button>
           </div>
+        </div>
+         <div v-if="error" class="col-span-3 text-red-500 text-center">
+          Failed to load projects: {{ error.message }}
+        </div>
+        <div v-if="!campaigns?.length && !error" class="col-span-3 text-gray-500 text-center">
+          No projects available at the moment.
         </div>
       </div>
     </section>
@@ -199,29 +202,75 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
-const { data: campaignsData, error } = await useAsyncData('campaigns', () =>
-  $fetch('/api/v1/campaigns', {
-    baseURL: config.public.BASE_URL_API,
-  })
-)
-if (error.value) {
-  console.error('Error fetching campaigns:', error.value)
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+// Komponen Navbar, CallToAction, dan Footer diasumsikan akan di-auto-import
+// jika berada di direktori ~/components/
+
+const config = useRuntimeConfig();
+const router = useRouter();
+
+// Variabel reaktif untuk menyimpan data campaign dan error
+const campaigns = ref([]);
+const error = ref(null);
+const isLoading = ref(true); // Untuk state loading jika diperlukan
+
+// Mengambil data campaign menggunakan $fetch (auto-imported di Nuxt 3)
+// useAsyncData atau useFetch lebih cocok jika membutuhkan fitur SSR/SSG yang lebih canggih
+// atau de-duplikasi request. Untuk halaman utama yang mungkin CSR, $fetch bisa cukup.
+async function fetchCampaigns() {
+  isLoading.value = true;
+  error.value = null; // Reset error sebelum fetch
+  try {
+    const response = await $fetch('/api/v1/campaigns', {
+      baseURL: config.public.BASE_URL_API,
+      // bisa menambahkan query params di sini jika diperlukan
+      // params: { user_id: XYZ }
+    });
+    // Sesuaikan dengan struktur respons API
+    // Diasumsikan API mengembalikan objek dengan properti 'data' yang berisi array campaign
+    campaigns.value = response.data || [];
+  } catch (e) {
+    console.error('Error fetching campaigns:', e);
+    error.value = e; // Simpan error untuk ditampilkan jika perlu
+    campaigns.value = []; // Kosongkan campaigns jika error
+  } finally {
+    isLoading.value = false;
+  }
 }
-const campaigns = computed(() => campaignsData.value?.data || [])
-const baseURL = computed(() => config.public.BASE_URL_API)
 
-import { useRouter } from 'vue-router'
+// Panggil fetchCampaigns saat komponen dimuat
+// onMounted(fetchCampaigns); // Jika ingin fetch di client-side setelah mount
+// Atau gunakan useAsyncData untuk fetch di server/client dengan de-duplikasi
+const { data: fetchedCampaignsData, error: fetchError, pending } = await useAsyncData(
+  'campaigns',
+  () => $fetch('/api/v1/campaigns', {
+    baseURL: config.public.BASE_URL_API,
+    // pick: ['id', 'name', 'short_description', 'image_url', 'goal_amount', 'current_amount'] // Pilih hanya field yang dibutuhkan
+  }), {
+    // Opsi default: server: true, lazy: false
+    // Jika ingin lazy loading:
+    // lazy: true,
+    // server: false, // jika hanya ingin fetch di client
+    transform: (response) => response.data || [] // Sesuaikan dengan struktur data
+  }
+);
 
-const router = useRouter()
+if (fetchError.value) {
+  console.error('Error fetching campaigns with useAsyncData:', fetchError.value);
+  campaigns.value = []; // Set ke array kosong jika ada error
+  error.value = fetchError.value; // Simpan error
+} else {
+  campaigns.value = fetchedCampaignsData.value;
+}
+
 
 function goToProject(id) {
   router.push({
-    name: 'projects-id',
+    name: 'projects-id', // Pastikan nama rute ini sesuai dengan penamaan file _id.vue
     params: { id },
-  })
+  });
 }
-
 </script>
 
 <style lang="scss">
@@ -233,7 +282,7 @@ function goToProject(id) {
   left: 0;
   width: 100%;
   height: 640px;
-  background-image: url('/auth-background.svg');
+  background-image: url('/auth-background.svg'); /* Pastikan path ini benar dan file ada di direktori public */
   background-position: top right;
   background-repeat: no-repeat;
   background-color: #3b41e3;
@@ -258,7 +307,7 @@ function goToProject(id) {
 }
 
 .call-to-action {
-  background-image: url('/auth-background.svg');
+  background-image: url('/auth-background.svg'); /* Pastikan path ini benar */
   background-position: top right;
   background-repeat: no-repeat;
   background-size: 450px;
@@ -309,4 +358,7 @@ footer {
     box-shadow: 0 0 0 1px #3b41e3;
   }
 }
+/* Pastikan class .progress-striped sudah didefinisikan jika menggunakannya,
+   misalnya di tailwind.css atau file CSS global, seperti yang sudah ada di
+   frontend/assets/css/tailwind.css */
 </style>
