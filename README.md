@@ -109,11 +109,11 @@ Make sure to set required keys for database, API credentials, etc.
 
 ## Reference
 
-[BWA Starup](https://buildwithangga.com/kelas/full-stack-golang-vue-nuxtjs-website-crowdfunding?main_leads=searchsuggestion)
-[Gin Gonic](https://gin-gonic.com/en/)
-[PostgreSQL](https://www.postgresql.org/)
-[NuxtJS](https://nuxt.com/)
-[Midtrans](https://midtrans.com/id)
+- [BWA Starup](https://buildwithangga.com/kelas/full-stack-golang-vue-nuxtjs-website-crowdfunding?main_leads=searchsuggestion)
+- [Gin Gonic](https://gin-gonic.com/en/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [NuxtJS](https://nuxt.com/)
+- [Midtrans](https://midtrans.com/id)
 
 ## 📝 License
 
