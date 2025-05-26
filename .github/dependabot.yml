@@ -3,14 +3,14 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/backend"
     schedule:
-      interval: "weekly"
+      interval: "monthly" 
     commit-message:
-      prefix: "deps(npm)"
+      prefix: "deps(gomod)" 
   
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
-      interval: "weekly"
+      interval: "monthly" 
     commit-message:
       prefix: "deps(npm)"
     open-pull-requests-limit: 5
@@ -18,4 +18,4 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly" 
