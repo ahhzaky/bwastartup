@@ -85,22 +85,21 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '~/stores/auth'; // Asumsi path store
+import { useAuthStore } from '~/stores/auth'; 
 
-// Mendefinisikan layout
 definePageMeta({
-  layout: 'auth', // Pastikan memiliki layout bernama 'auth' di direktori layouts
+  layout: 'auth', 
 });
 
 const router = useRouter();
-const authStore = useAuthStore(); // Jika ingin menyimpan state setelah registrasi
+const authStore = useAuthStore(); 
 const config = useRuntimeConfig();
 
 const registerData = ref({
-  name: 'Input user', // Default value, bisa dikosongkan
-  email: 'test@test.com', // Default value, bisa dikosongkan
-  occupation: 'Product Designer', // Default value, bisa dikosongkan
-  password: 'password', // Default value, sebaiknya dikosongkan
+  name: '', 
+  email: '', 
+  occupation: '', 
+  password: '',
 });
 
 async function userRegister() {
@@ -115,36 +114,25 @@ async function userRegister() {
 
     if (!response.ok) {
       const errorData = await response.json();
-      // bisa menampilkan pesan error spesifik dari API
       throw new Error(errorData.meta?.message || 'Registration failed');
     }
 
     const responseData = await response.json();
     console.log(responseData);
 
-    // Jika API mengembalikan token atau data user setelah registrasi,
-    // bisa menyimpannya di Pinia store atau localStorage di sini.
-    // Contoh:
-    // if (responseData.data.token) {
-    //   localStorage.setItem('authToken', responseData.data.token);
-    //   authStore.login(responseData.data.user); // Asumsi API mengembalikan data user
-    // }
-
-    // Redirect ke halaman sukses atau login
-    // Mengganti `this.$router.push({ path: '/upload' })`
-    // Umumnya setelah registrasi, pengguna diarahkan ke halaman login atau halaman sukses
-    router.push('/register-success'); // Atau '/login', atau '/upload' jika itu alur yang diinginkan
+    // change if `this.$router.push({ path: '/upload' })`
+    router.push('/register-success'); 
 
   } catch (err) {
     console.error(err.message || err);
-    // Handle error (tampilkan notifikasi ke pengguna, dll.)
+    // Handle error (show notif.)
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .auth-background {
-  background-image: url('/sign-up-background.jpg'); /* Pastikan path gambar benar dan ada di direktori public */
+  background-image: url('/sign-up-background.jpg'); 
   background-position: center;
   background-size: cover;
 }

@@ -358,7 +358,5 @@ footer {
     box-shadow: 0 0 0 1px #3b41e3;
   }
 }
-/* Pastikan class .progress-striped sudah didefinisikan jika menggunakannya,
-   misalnya di tailwind.css atau file CSS global, seperti yang sudah ada di
-   frontend/assets/css/tailwind.css */
+
 </style>

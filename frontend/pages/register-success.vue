@@ -27,9 +27,8 @@
 <script setup>
 import { useRouter } from 'vue-router';
 
-// Mendefinisikan layout untuk halaman ini
 definePageMeta({
-  layout: 'success', // Pastikan memiliki layout bernama 'success.vue' di direktori layouts
+  layout: 'success', 
 });
 
 const router = useRouter();
@@ -40,11 +39,9 @@ function goToHome() {
 </script>
 
 <style lang="scss" scoped>
-/* .auth-background tidak digunakan secara langsung di template ini.
-   Jika dibutuhkan untuk layout 'success', pastikan ada di layouts/success.vue atau CSS global.
-*/
+
 .auth-background {
-  background-image: url('/sign-in-background.jpg'); /* Pastikan path ini benar jika digunakan */
+  background-image: url('/sign-in-background.jpg'); 
   background-position: center;
   background-size: cover;
 }

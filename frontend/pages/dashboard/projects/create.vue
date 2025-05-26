@@ -130,14 +130,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '~/stores/auth'; // Pastikan path ini benar
+import { useAuthStore } from '~/stores/auth'; 
 
-// Komponen Navbar dan Footer akan di-auto-import
 // import Navbar from '~/components/Navbar.vue';
 // import Footer from '~/components/Footer.vue';
 
 definePageMeta({
-  middleware: 'auth', // Pastikan middleware auth sudah ada dan berfungsi
+  middleware: 'auth', 
 });
 
 const router = useRouter();
@@ -149,7 +148,7 @@ const campaign = ref({
   short_description: '',
   description: '',
   goal_amount: 0,
-  perks: '', // Perks diharapkan sebagai string tunggal dipisahkan koma oleh backend
+  perks: '', 
 });
 
 const isSaving = ref(false);
@@ -170,7 +169,6 @@ async function saveCampaign() {
   isSaving.value = true;
   errorLog.value = null;
 
-  // Pastikan goal_amount adalah angka
   const payload = {
     ...campaign.value,
     goal_amount: Number(campaign.value.goal_amount) || 0,
@@ -187,11 +185,10 @@ async function saveCampaign() {
       body: payload,
     });
 
-    // response.data.id berdasarkan struktur yang diharapkan dari CreateCampaign handler
     if (response.data && response.data.id) {
         alert('Campaign created successfully!');
         router.push({
-            name: 'dashboard-projects-id', // Rute ke detail campaign yang baru dibuat
+            name: 'dashboard-projects-id', 
             params: { id: response.data.id },
         });
     } else {
@@ -210,7 +207,6 @@ async function saveCampaign() {
 </script>
 
 <style lang="scss">
-/* Style dari halaman dashboard/index.vue atau halaman lain yang relevan dapat dimasukkan di sini */
 .dashboard-header {
   background-image: url('/auth-background.svg');
   background-position: top right;

@@ -58,20 +58,19 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useAuthStore } from '~/stores/auth'; // Sesuaikan path jika berbeda
+import { useAuthStore } from '~/stores/auth'; 
 import { useRouter } from 'vue-router';
 
-// Mendefinisikan layout
 definePageMeta({
-  layout: 'auth', // Pastikan  memiliki layout bernama 'auth'
-  middleware: 'auth' // Tambahkan middleware auth jika halaman ini memerlukan login
+  layout: 'auth', 
+  middleware: 'auth' 
 });
 
 const authStore = useAuthStore();
 const router = useRouter();
 const config = useRuntimeConfig();
 
-const previewUrl = ref(authStore.user?.image_url || '/avatar.jpg'); // Default atau dari store
+const previewUrl = ref(authStore.user?.image_url || '/avatar.jpg'); 
 const selectedFile = ref(null);
 const fileInput = ref(null);
 
@@ -121,7 +120,7 @@ async function uploadAvatar() {
     const responseData = await response.json();
     console.log(responseData);
 
-    // Contoh: Update user state di Pinia jika perlu
+    // example of updating user avatar in store
     // if (responseData.data && responseData.data.avatar_file_name) {
     //   authStore.updateUserAvatar(responseData.data.avatar_file_name);
     // }
@@ -129,7 +128,6 @@ async function uploadAvatar() {
     router.push('/register/success');
   } catch (err) {
     console.error(err.message || err);
-    // Handle error (tampilkan notifikasi ke pengguna, dll.)
   }
 }
 

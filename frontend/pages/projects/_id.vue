@@ -232,21 +232,17 @@ async function fundProject() {
 const progressBarWidth = computed(() => {
   if (campaignData.value && campaignData.value.goal_amount > 0) {
     const percentage = (campaignData.value.current_amount / campaignData.value.goal_amount) * 100;
-    return Math.min(percentage, 100); // Pastikan tidak lebih dari 100%
+    return Math.min(percentage, 100); 
   }
   return 0;
 });
 
-// Impor komponen Navbar, CallToAction, dan Footer jika belum di-auto-import
-// dan belum terdaftar secara global.
-// Jika komponen ada di ~/components/namafolder/NamaKomponen.vue, maka bisa dipanggil <NamafolderNamaKomponen />
-// atau jika langsung di ~/components/Navbar.vue maka <Navbar />
+
 </script>
 
 <style lang="scss">
-/* Styles yang  berikan sebelumnya */
 .project-header {
-  background-image: url('/auth-background.svg'); /* Pastikan path ini benar dan file ada di public */
+  background-image: url('/auth-background.svg'); 
   background-position: top right;
   background-repeat: no-repeat;
   background-color: #3b41e3;
@@ -271,7 +267,7 @@ const progressBarWidth = computed(() => {
 }
 
 .call-to-action {
-  background-image: url('/auth-background.svg'); /* Pastikan path ini benar */
+  background-image: url('/auth-background.svg'); 
   background-position: top right;
   background-repeat: no-repeat;
   background-size: 450px;
@@ -325,7 +321,7 @@ footer {
 
 .list-check {
   li {
-    background: url('/icon-checklist.svg') no-repeat left 8px; /* Pastikan path ini benar */
+    background: url('/icon-checklist.svg') no-repeat left 8px; 
     padding: 6px 0px 3px 28px;
   }
 }
@@ -337,7 +333,7 @@ footer {
     position: absolute;
     top: 38%;
     left: 41%;
-    content: url('/icon-thumbnail-hover.svg'); /* Pastikan path ini benar */
+    content: url('/icon-thumbnail-hover.svg'); 
   }
   img {
     opacity: 0.3;

@@ -92,17 +92,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useAuthStore } from '~/stores/auth'; // Pastikan path ini benar
+import { useAuthStore } from '~/stores/auth'; 
 import { useRouter } from 'vue-router';
 
-// Komponen Navbar dan Footer akan di-auto-import jika ada di ~/components
 // import Navbar from '~/components/Navbar.vue';
 // import Footer from '~/components/Footer.vue';
 
-// Mendefinisikan middleware dan layout untuk halaman ini
 definePageMeta({
-  middleware: 'auth', // Pastikan  memiliki middleware/auth.js (atau .ts)
-  // Jika  memiliki layout khusus untuk dashboard,  bisa menambahkannya di sini
+  middleware: 'auth',
   // layout: 'dashboard', 
 });
 
@@ -112,12 +109,11 @@ const config = useRuntimeConfig();
 
 const campaigns = ref([]);
 const fetchError = ref(null);
-const pending = ref(true); // Untuk status loading
+const pending = ref(true); 
 
 async function fetchUserCampaigns() {
   if (!authStore.user || !authStore.user.id) {
     console.error('User not logged in or user ID not available');
-    // Mungkin redirect ke login jika user ID tidak ada, tergantung logika auth middleware 
     // router.push('/login'); 
     pending.value = false;
     return;
@@ -126,7 +122,6 @@ async function fetchUserCampaigns() {
   const token = localStorage.getItem('authToken');
   if (!token) {
     console.error('Auth token not found');
-    // Mungkin redirect ke login
     // router.push('/login');
     pending.value = false;
     return;
@@ -141,7 +136,6 @@ async function fetchUserCampaigns() {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-      // Opsi transform untuk langsung mendapatkan array dari response.data
       transform: (res) => res.data || []
     });
     campaigns.value = response;
@@ -154,16 +148,13 @@ async function fetchUserCampaigns() {
   }
 }
 
-// Panggil fetchUserCampaigns saat komponen dimuat jika pengguna sudah login
-// Atau, middleware 'auth'  seharusnya sudah memastikan pengguna login
+// Middleware authStore.loggedIn must be true to access this page.
 onMounted(() => {
   if (authStore.loggedIn) {
     fetchUserCampaigns();
   } else {
-    // Jika authStore.loggedIn false, middleware auth seharusnya sudah redirect.
-    // Namun, sebagai fallback,  bisa tambahkan logika di sini.
     console.log('User not logged in, redirecting from dashboard index.');
-    // router.push('/login'); // Tergantung bagaimana middleware  bekerja
+    // router.push('/login'); 
     pending.value = false;
   }
 });
@@ -176,18 +167,12 @@ const progressBarWidth = (campaign) => {
   return 0;
 };
 
-// Fungsi goToProject tidak lagi diperlukan di sini karena <NuxtLink> sudah menangani navigasi
-// function goToProject(id) {
-//   router.push({
-//     name: 'dashboard-projects-id', // Ini harusnya sesuai dengan struktur file, misal pages/dashboard/projects/[id].vue
-//     params: { id },
-//   });
-// }
+
 </script>
 
 <style lang="scss">
 .dashboard-header {
-  background-image: url('/auth-background.svg'); /* Pastikan path ini benar dan file ada di direktori public */
+  background-image: url('/auth-background.svg'); 
   background-position: top right;
   background-repeat: no-repeat;
   background-color: #3b41e3;

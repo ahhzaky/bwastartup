@@ -60,7 +60,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useAuthStore } from '~/stores/auth'; // Sesuaikan path jika berbeda
+import { useAuthStore } from '~/stores/auth'; 
 import { useRouter } from 'vue-router';
 
 // Mendefinisikan layout
@@ -70,7 +70,7 @@ definePageMeta({
 
 const authStore = useAuthStore();
 const router = useRouter();
-const config = useRuntimeConfig(); // Ini sekarang akan menggunakan fungsi bawaan Nuxt
+const config = useRuntimeConfig(); 
 
 const loginData = ref({
   email: 'moder-test@jck.com',
@@ -111,10 +111,7 @@ async function userLogin() {
   }
 }
 
-// HAPUS BAGIAN INI:
-// function useRuntimeConfig() {
-//  throw new Error('Function not implemented.');
-// }
+
 </script>
 
 <style lang="scss" scoped>

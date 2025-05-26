@@ -89,18 +89,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { useRouter } from 'vue-router'; // Jika diperlukan untuk navigasi programatik
+import { useRouter } from 'vue-router'; 
 
-// Komponen Navbar dan Footer akan di-auto-import
 // import Navbar from '~/components/Navbar.vue';
 // import Footer from '~/components/Footer.vue';
 
 definePageMeta({
-  middleware: 'auth', // Pastikan middleware auth sudah ada dan berfungsi
+  middleware: 'auth', 
 });
 
 const authStore = useAuthStore();
-const router = useRouter(); // Jika  butuh router instance
+const router = useRouter(); 
 const config = useRuntimeConfig();
 
 const transactions = ref([]);
@@ -111,7 +110,6 @@ async function fetchUserTransactions() {
   if (!authStore.loggedIn || !authStore.user?.id) {
     console.warn('User not logged in or user ID missing for fetching transactions.');
     pending.value = false;
-    // Middleware 'auth' seharusnya sudah menghandle redirect jika tidak login
     return;
   }
 
@@ -119,7 +117,6 @@ async function fetchUserTransactions() {
   if (!token) {
     console.warn('Auth token not found for fetching transactions.');
     pending.value = false;
-    // Middleware 'auth' seharusnya sudah menghandle redirect
     return;
   }
   
@@ -127,14 +124,12 @@ async function fetchUserTransactions() {
   fetchError.value = null;
 
   try {
-    // Berdasarkan handler/transaction.go, endpointnya adalah /api/v1/transactions
-    // dan sudah difilter berdasarkan currentUser (dari token) di backend
     const response = await $fetch('/api/v1/transactions', {
       baseURL: config.public.BASE_URL_API,
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-      transform: (res) => res.data || [] // Sesuai UserTransactionFormatter
+      transform: (res) => res.data || [] //  UserTransactionFormatter
     });
     transactions.value = response;
   } catch (e) {
@@ -146,19 +141,16 @@ async function fetchUserTransactions() {
   }
 }
 
-// Panggil fetchUserTransactions saat komponen dimuat
 onMounted(() => {
   fetchUserTransactions();
 });
 
-// Helper function untuk format tanggal (opsional, bisa dipindah ke utils)
 function formatDate(dateString) {
   if (!dateString) return '';
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
   return new Date(dateString).toLocaleDateString('id-ID', options);
 }
 
-// Helper function untuk styling status (opsional)
 function statusClass(status) {
   if (status === 'pending') return 'text-yellow-600 font-semibold';
   if (status === 'paid') return 'text-green-600 font-semibold';
@@ -169,7 +161,6 @@ function statusClass(status) {
 </script>
 
 <style lang="scss">
-/* Style yang sudah ada sebelumnya dari halaman dashboard/index.vue */
 .dashboard-header {
   background-image: url('/auth-background.svg');
   background-position: top right;
@@ -202,9 +193,6 @@ function statusClass(status) {
   background-size: 450px;
 }
 
-/*  mungkin ingin menghapus style .card-project jika tidak relevan di halaman ini */
-/* atau sesuaikan jika tampilannya berbeda */
-/* .card-project { ... } */
 
 footer {
   z-index: inherit;
