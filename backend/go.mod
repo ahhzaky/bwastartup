@@ -14,7 +14,7 @@ require (
 	github.com/leekchan/accounting v1.0.0
 	github.com/veritrans/go-midtrans v0.0.0-20210616100512-16326c5eeb00
 	golang.org/x/crypto v0.38.0
-	gorm.io/driver/postgres v1.5.11
+	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.26.1
 )
 
